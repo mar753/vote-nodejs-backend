@@ -12,5 +12,8 @@
   "dependencies": {
     "express": "^4.16.3"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "jasmine": "^3.2.0",
+    "proxyquire": "^2.1.0"
+  }
 }
