@@ -33,7 +33,8 @@ describe('Server routes unit tests', function() {
     expect(expressStubFunctions.listen).toHaveBeenCalledWith(3000, jasmine.any(Function));
     expect(expressStubFunctions.get).toHaveBeenCalledWith('/items', jasmine.any(Function));
     expect(expressStubFunctions.post).toHaveBeenCalledWith('/items', jasmine.any(Function));
-    expect(expressStubFunctions.put).toHaveBeenCalledWith('/items/:id', jasmine.any(Function));
+    expect(expressStubFunctions.put.calls.allArgs()).toEqual([['/items/:id', jasmine.any(Function)],
+      ['/items/:id/vote', jasmine.any(Function)]]);
     expect(expressStubFunctions.delete).toHaveBeenCalledWith('/items/:id', jasmine.any(Function));
     expect(expressStubFunctions.use.calls.count()).toEqual(3);
   });

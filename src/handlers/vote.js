@@ -24,7 +24,7 @@ module.exports = {
     if (db.items.length > 0) {
       idToAdd = db.items[db.items.length-1].id + 1;
     }
-    db.items.push({id: idToAdd, name: req.body.value});
+    db.items.push({id: idToAdd, name: req.body.value, vote: 0});
     res.send();
   },
 
@@ -35,6 +35,17 @@ module.exports = {
       res.status(404).send('Item does not exist! Use POST to insert new items');
     } else {
       db.items[foundItemIdx].name = req.body.value;
+      res.send();
+    }
+  },
+
+  handlePutVote: function(req, res) {
+    const idToEdit = parseInt(req.params.id);
+    const foundItemIdx = db.items.findIndex(item => item.id === idToEdit);
+    if (foundItemIdx === -1) {
+      res.status(404).send('Item does not exist! Use POST to insert new items');
+    } else {
+      db.items[foundItemIdx].vote += req.body.value;
       res.send();
     }
   },

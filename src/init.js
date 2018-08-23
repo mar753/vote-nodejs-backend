@@ -16,6 +16,7 @@ function setupRoutes(app) {
   app.post('/items', voteHandler.handlePostItem);
   app.put('/items/:id', voteHandler.handlePutItem);
   app.delete('/items/:id', voteHandler.handleDeleteItem);
+  app.put('/items/:id/vote', voteHandler.handlePutVote);
 }
 
 function setupRouteNotFound(app) {

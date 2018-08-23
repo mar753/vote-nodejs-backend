@@ -12,8 +12,8 @@ describe('Vote handler unit tests', function() {
   beforeEach(function() {
     responsePattern = {
       items: [
-        {id: 1, name: 'Joe'},
-        {id: 2, name: 'Mary'}
+        {id: 1, name: 'Joe', vote: 0},
+        {id: 2, name: 'Mary', vote: 0}
     ]};
     res.header = jasmine.createSpy();
     res.send = jasmine.createSpy();
@@ -35,7 +35,7 @@ describe('Vote handler unit tests', function() {
   it('checks the handleGetItems ?id= query parameter', function() {
     req.query = {id: 2};
     voteHandler.handleGetItems(req, res);
-    expect(res.json).toHaveBeenCalledWith({id: 2, name: 'Mary'});
+    expect(res.json).toHaveBeenCalledWith({id: 2, name: 'Mary', vote: 0});
   });
 
   it('checks the handleGetItems no ?id= query parameter', function() {
@@ -47,7 +47,7 @@ describe('Vote handler unit tests', function() {
   it('checks the handleGetItems ?id= as second query parameter', function() {
     req.query = {name: 'abc', id: 2};
     voteHandler.handleGetItems(req, res);
-    expect(res.json).toHaveBeenCalledWith({id: 2, name: 'Mary'});
+    expect(res.json).toHaveBeenCalledWith({id: 2, name: 'Mary', vote: 0});
   });
 
   it('checks if the handlePostItem route was properly handled - empty db', function() {
@@ -89,6 +89,30 @@ describe('Vote handler unit tests', function() {
     expect(responsePattern.items.length).toBe(2);
     voteHandler.handlePutItem(req, res);
     expect(responsePattern.items.length).toBe(2);
+    expect(innerSendSpy).toHaveBeenCalledWith(
+      'Item does not exist! Use POST to insert new items');
+    expect(res.status).toHaveBeenCalledWith(404);
+  });
+
+  it('checks if the handlePutVote route item was edited', function() {
+    req.body = {value: -1};
+    req.params = {id: 1};
+    expect(responsePattern.items.length).toBe(2);
+    expect(responsePattern.items[0].vote).toBe(0);
+    voteHandler.handlePutVote(req, res);
+    expect(responsePattern.items.length).toBe(2);
+    expect(responsePattern.items[0].vote).toBe(-1);
+    expect(res.send).toHaveBeenCalled();
+  });
+
+  it('checks if the handlePutVote route item was not edited', function() {
+    req.body = {newValue: 1};
+    req.params = {id: 5};
+    expect(responsePattern.items.length).toBe(2);
+    expect(responsePattern.items[0].vote).toBe(0);
+    voteHandler.handlePutVote(req, res);
+    expect(responsePattern.items.length).toBe(2);
+    expect(responsePattern.items[0].vote).toBe(0);
     expect(innerSendSpy).toHaveBeenCalledWith(
       'Item does not exist! Use POST to insert new items');
     expect(res.status).toHaveBeenCalledWith(404);
