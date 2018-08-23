@@ -5,11 +5,11 @@ const otherHandlers = require('../../src/handlers/other');
 describe('Other handlers unit tests', function() {
   const req = {};
   const res = {};
-  const sendSpy = jasmine.createSpy();
+  const innerSendSpy = jasmine.createSpy();
 
   beforeEach(function() {
     res.header = jasmine.createSpy();
-    res.status = jasmine.createSpy().and.returnValue({send: sendSpy});
+    res.status = jasmine.createSpy().and.returnValue({send: innerSendSpy});
   });
 
   it('checks if CORS headers were properly added by a handler', function() {
@@ -23,7 +23,7 @@ describe('Other handlers unit tests', function() {
 
   it('checks if message for HTTP 404 handler is proper', function() {
     otherHandlers.notFound(req, res);
-    expect(sendSpy).toHaveBeenCalledWith('This route does not exist (HTTP 404)');
+    expect(innerSendSpy).toHaveBeenCalledWith('This route does not exist (HTTP 404)');
     expect(res.status).toHaveBeenCalledWith(404);
   });
 });
