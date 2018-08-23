@@ -1,11 +1,14 @@
 'use strict'
 
-const express = require('express');
-const otherHandlers = require('./handlers/other');
-const voteHandler = require('./handlers/vote');
+const
+  express = require('express'),
+  bodyParser = require('body-parser'),
+  otherHandlers = require('./handlers/other'),
+  voteHandler = require('./handlers/vote');
 
-function setupResponseHeaders(app) {
-  app.use(otherHandlers.cors);
+function setupMiddleware(app) {
+  app.use(otherHandlers.handlePreflight);
+  app.use(bodyParser.json());
 }
 
 function setupRoutes(app) {
@@ -22,7 +25,7 @@ function setupRouteNotFound(app) {
 function start(port = 3000) {
   const app = express();
 
-  setupResponseHeaders(app);
+  setupMiddleware(app);
   setupRoutes(app);
   setupRouteNotFound(app);
 

@@ -8,7 +8,7 @@ module.exports = {
     for (let param in req.query) {
       if (param === 'id') { // ?id= parameter handling
         found = db.items.find(
-          item => item.id === parseFloat(req.query.id));
+          item => item.id === parseInt(req.query.id));
         break;
       }
     }
@@ -29,7 +29,7 @@ module.exports = {
   },
 
   handlePutItem: function(req, res) {
-    const idToEdit = req.params.id;
+    const idToEdit = parseInt(req.params.id);
     const foundItemIdx = db.items.findIndex(item => item.id === idToEdit);
     if (foundItemIdx === -1) {
       res.status(404).send('Item does not exist! Use POST to insert new items');
@@ -40,7 +40,7 @@ module.exports = {
   },
 
   handleDeleteItem: function(req, res) {
-    const idToDelete = req.params.id;
+    const idToDelete = parseInt(req.params.id);
     const foundItemIdx = db.items.findIndex(item => item.id === idToDelete);
     if (foundItemIdx === -1) {
       res.status(404).send('Item does not exist!');
