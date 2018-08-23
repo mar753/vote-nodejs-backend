@@ -3,8 +3,7 @@
 const
   express = require('express'),
   bodyParser = require('body-parser'),
-  otherHandlers = require('./handlers/other'),
-  voteHandler = require('./handlers/vote');
+  otherHandlers = require('./handlers/other');
 
 function setupMiddleware(app) {
   app.use(otherHandlers.handlePreflight);
@@ -12,11 +11,8 @@ function setupMiddleware(app) {
 }
 
 function setupRoutes(app) {
-  app.get('/items', voteHandler.handleGetItems);
-  app.post('/items', voteHandler.handlePostItem);
-  app.put('/items/:id', voteHandler.handlePutItem);
-  app.delete('/items/:id', voteHandler.handleDeleteItem);
-  app.put('/items/:id/vote', voteHandler.handlePutVote);
+  module.exports.app = app;
+  require('./routes/voteRoutes');
 }
 
 function setupRouteNotFound(app) {
