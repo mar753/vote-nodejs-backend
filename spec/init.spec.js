@@ -13,7 +13,7 @@ describe('Server routes unit tests', function() {
     };
     const expressStub = jasmine.createSpy().and.returnValue(expressStubFunctions);
     const httpServerFake = {};
-    let server;
+    let server, routesSpy;
 
   beforeEach(function() {
     spyOn(expressStubFunctions, "get");
@@ -22,9 +22,10 @@ describe('Server routes unit tests', function() {
     spyOn(expressStubFunctions, "delete");
     spyOn(expressStubFunctions, "use");
     spyOn(expressStubFunctions, "listen").and.returnValue(httpServerFake);
-
+    routesSpy = jasmine.createSpy();
     server = proxyquire('../src/init.js', {
-      express: expressStub
+      express: expressStub,
+      './routes/voteRoutes.js': routesSpy
     });
   });
 
@@ -37,5 +38,6 @@ describe('Server routes unit tests', function() {
       ['/items/:id/vote', jasmine.any(Function)]]);
     expect(expressStubFunctions.delete).toHaveBeenCalledWith('/items/:id', jasmine.any(Function));
     expect(expressStubFunctions.use.calls.count()).toEqual(3);
+    expect(routesSpy).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,8 +1,16 @@
 'use strict';
 
+const sql = require('mssql'),
+  config = require('../../config/config.json');
+
+let sqlPool;
 const db = {items: []};
 
 module.exports = {
+  init: function() {
+    return getAllItemsFromDb();
+  },
+
   handleGetItems: function(req, res) {
     let found;
     for (let param in req.query) {
@@ -25,6 +33,7 @@ module.exports = {
       idToAdd = db.items[db.items.length-1].id + 1;
     }
     db.items.push({id: idToAdd, name: req.body.value, vote: 0});
+    postItemsToDb(idToAdd, req);
     res.send();
   },
 
@@ -35,6 +44,7 @@ module.exports = {
       res.status(404).send('Item does not exist! Use POST to insert new items');
     } else {
       db.items[foundItemIdx].name = req.body.value;
+      editItemInDb(foundItemIdx);
       res.send();
     }
   },
@@ -46,6 +56,7 @@ module.exports = {
       res.status(404).send('Item does not exist! Use POST to insert new items');
     } else {
       db.items[foundItemIdx].vote += req.body.value;
+      editVoteInDb(foundItemIdx);
       res.send();
     }
   },
@@ -57,7 +68,67 @@ module.exports = {
       res.status(404).send('Item does not exist!');
     } else {
       db.items.splice(foundItemIdx, 1);
+      deleteItemFromDb(idToDelete);
       res.send();
     }
   }
+}
+
+function getAllItemsFromDb() {
+  return sql.connect(config).then(pool => {
+    sqlPool = pool;
+    return pool.request()
+      .query('SELECT * FROM items');
+  }).then(result => {
+    db.items = result.recordset;
+  })
+  .catch(err => {
+    console.error(err);
+  });
+}
+
+function postItemsToDb(idToAdd, req) {
+  sqlPool.request()
+    .input('id', sql.Int, idToAdd)
+    .input('name', sql.VarChar(sql.MAX), req.body.value)
+    .input('vote', sql.Int, 0)
+    .query('INSERT INTO [dbo].[items] ([id],[name],[vote]) ' +
+        'VALUES (@id, @name, @vote)')
+    .catch(err => {
+      console.error(err);
+    });
+}
+
+function editItemInDb(foundItemIdx) {
+  sqlPool.request()
+    .input('id', sql.Int, db.items[foundItemIdx].id)
+    .input('name', sql.VarChar(sql.MAX), db.items[foundItemIdx].name)
+    .query('UPDATE [dbo].[items] ' +
+          'SET [name] = @name ' +
+          'WHERE [id] = @id')
+    .catch(err => {
+      console.error(err);
+    });
+}
+
+function editVoteInDb(foundItemIdx) {
+  sqlPool.request()
+    .input('id', sql.Int, db.items[foundItemIdx].id)
+    .input('vote', sql.Int, db.items[foundItemIdx].vote)
+    .query('UPDATE [dbo].[items] ' +
+            'SET [vote] = @vote ' +
+            'WHERE [id] = @id')
+    .catch(err => {
+      console.error(err);
+    });
+}
+
+function deleteItemFromDb(idToDelete) {
+  sqlPool.request()
+    .input('id', sql.Int, idToDelete)
+    .query('DELETE FROM [dbo].[items] ' +
+        'WHERE [id] = @id')
+    .catch(err => {
+      console.error(err);
+    });
 }

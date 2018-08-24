@@ -1,0 +1,9 @@
+{
+    "user": "sa",
+    "password": "321ewq",
+    "server": "localhost\\SQLEXPRESS", 
+    "database": "vote",
+    "options": {
+      "encrypt": false
+    }
+}

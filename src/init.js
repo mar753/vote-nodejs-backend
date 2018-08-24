@@ -12,7 +12,8 @@ function setupMiddleware(app) {
 
 function setupRoutes(app) {
   module.exports.app = app;
-  require('./routes/voteRoutes');
+  const init = require('./routes/voteRoutes');
+  init();
 }
 
 function setupRouteNotFound(app) {
